@@ -34,7 +34,7 @@ export default function App() {
   const [levelUpMsg, setLevelUpMsg] = useState(false)
   const [negativeWarning, setNegativeWarning] = useState(false)
   const [showResetConfirm, setShowResetConfirm] = useState(false)
-  const [screen, setScreen] = useState(saved.level ? 'game' : 'title')
+  const [screen, setScreen] = useState('title')
 
   useEffect(() => {
     setUserValues(initValues(template.symbols))

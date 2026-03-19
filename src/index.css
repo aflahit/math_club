@@ -144,6 +144,20 @@ body::before {
 .animate-pop-up       { animation: pop-up 0.35s cubic-bezier(.36,.07,.19,.97) both; }
 .animate-star-burst   { animation: star-burst 0.6s ease; }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(var(--base-rotate, 0deg)); }
+  50%       { transform: translateY(-14px) rotate(var(--base-rotate, 0deg)); }
+}
+
+@keyframes sway {
+  0%, 100% { transform: translateY(var(--float-y, 0px)) rotate(calc(var(--base-rotate, 0deg) - 6deg)); }
+  50%       { transform: translateY(var(--float-y, -10px)) rotate(calc(var(--base-rotate, 0deg) + 6deg)); }
+}
+
+.deco-symbol {
+  animation: sway var(--duration, 3s) ease-in-out var(--delay, 0s) infinite;
+}
+
 /* Symbol badge colors */
 .sym-color-0 { background-color: #FF8C42; border-color: #E07030; }
 .sym-color-1 { background-color: #4B9FFF; border-color: #2A7FDF; }

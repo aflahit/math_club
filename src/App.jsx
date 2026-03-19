@@ -97,9 +97,13 @@ export default function App() {
     }
   }
 
-  function handleNext() { loadNewPuzzle(level) }
+  function handleNext() {
+    playClick()
+    loadNewPuzzle(level)
+  }
 
   function handleTryAgain() {
+    playClick()
     setPhase('guessing')
     setUserAnswer(0)
     setCorrectAnswer(null)
@@ -111,6 +115,7 @@ export default function App() {
   }
 
   function handleReset() {
+    playClick()
     try { localStorage.removeItem('mathclub_progress') } catch { /* ignore */ }
     setShowResetConfirm(false)
     setLevel(1)
@@ -183,7 +188,7 @@ export default function App() {
         <div className="flex items-center gap-3">
           {/* Start Over */}
           <button
-            onPointerDown={() => setShowResetConfirm(true)}
+            onPointerDown={() => { playClick(); setShowResetConfirm(true) }}
             className="flex items-center gap-1 px-3 py-2 rounded-2xl transition-all active:scale-95"
             style={{
               background: '#F5F0FF', border: '2.5px solid #C49BFF',
@@ -240,7 +245,7 @@ export default function App() {
             </p>
             <div className="flex gap-4 w-full">
               <button
-                onPointerDown={() => setShowResetConfirm(false)}
+                onPointerDown={() => { playClick(); setShowResetConfirm(false) }}
                 className="btn-crayon flex-1 py-4 rounded-2xl text-2xl font-bold text-stone-600 active:scale-95"
                 style={{
                   fontFamily: 'Fredoka, sans-serif',

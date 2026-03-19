@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fredoka", sans-serif;
+  --font-body: "Nunito", sans-serif;
+
+  /* Crayon color palette */
+  --color-crayon-red: #FF4B4B;
+  --color-crayon-orange: #FF8C42;
+  --color-crayon-yellow: #FFD166;
+  --color-crayon-green: #56C596;
+  --color-crayon-blue: #4B9FFF;
+  --color-crayon-purple: #B27BFF;
+  --color-crayon-pink: #FF6EB4;
+  --color-crayon-teal: #3ECFCF;
+
+  /* Symbol colors */
+  --color-sym-star: #FF8C42;
+  --color-sym-triangle: #4B9FFF;
+  --color-sym-circle: #56C596;
+  --color-sym-square: #B27BFF;
+  --color-sym-diamond: #FF4B4B;
+  --color-sym-heart: #FF6EB4;
+
+  /* Background */
+  --color-paper: #FFFBF0;
+  --color-paper-dark: #FFF3D4;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  touch-action: manipulation;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-paper);
+  overscroll-behavior: none;
+}
+
+/* Paper texture background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 28px,
+      rgba(180,160,120,0.06) 28px,
+      rgba(180,160,120,0.06) 29px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* Crayon filter utility */
+.crayon {
+  filter: url(#crayon);
+}
+.crayon-strong {
+  filter: url(#crayon-strong);
+}
+
+/* Wobbly hand-drawn border effect */
+.btn-crayon {
+  position: relative;
+  font-family: var(--font-display);
+  font-weight: 700;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  filter: url(#crayon);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.btn-crayon:active {
+  transform: scale(0.93);
+}
+
+/* Bounce animation for correct answer */
+@keyframes bounce-in {
+  0%   { transform: scale(0.3); opacity: 0; }
+  50%  { transform: scale(1.1); opacity: 1; }
+  70%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-3deg); }
+  50%       { transform: rotate(3deg); }
+}
+
+@keyframes flash-green {
+  0%, 100% { background-color: transparent; }
+  30%       { background-color: rgba(86, 197, 150, 0.35); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX(8px); }
+  60%       { transform: translateX(-5px); }
+  80%       { transform: translateX(5px); }
+}
+
+@keyframes pop-up {
+  0%   { transform: translateY(20px) scale(0.8); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes star-burst {
+  0%   { transform: scale(1) rotate(0deg); }
+  25%  { transform: scale(1.4) rotate(10deg); }
+  50%  { transform: scale(1.2) rotate(-5deg); }
+  75%  { transform: scale(1.35) rotate(8deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes confetti-fall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(60px) rotate(360deg); opacity: 0; }
+}
+
+.animate-bounce-in   { animation: bounce-in 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+.animate-wiggle       { animation: wiggle 0.4s ease-in-out 3; }
+.animate-flash-green  { animation: flash-green 0.6s ease; }
+.animate-shake        { animation: shake 0.4s ease; }
+.animate-pop-up       { animation: pop-up 0.35s cubic-bezier(.36,.07,.19,.97) both; }
+.animate-star-burst   { animation: star-burst 0.6s ease; }
+
+/* Symbol badge colors */
+.sym-color-0 { background-color: #FF8C42; border-color: #E07030; }
+.sym-color-1 { background-color: #4B9FFF; border-color: #2A7FDF; }
+.sym-color-2 { background-color: #56C596; border-color: #36A576; }
+.sym-color-3 { background-color: #B27BFF; border-color: #925BDF; }
+.sym-color-4 { background-color: #FF4B4B; border-color: #DF2B2B; }
+.sym-color-5 { background-color: #FF6EB4; border-color: #DF4E94; }
+
+.sym-text-0 { color: #E07030; }
+.sym-text-1 { color: #2A7FDF; }
+.sym-text-2 { color: #36A576; }
+.sym-text-3 { color: #925BDF; }
+.sym-text-4 { color: #DF2B2B; }
+.sym-text-5 { color: #DF4E94; }

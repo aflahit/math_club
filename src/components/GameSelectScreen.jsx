@@ -74,19 +74,21 @@ export default function GameSelectScreen({ onSelectSymbols, onSelectSumStrings, 
   ]
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center px-6 py-8"
+    <div className="fixed inset-0 overflow-y-auto"
       style={{ fontFamily: 'Nunito, sans-serif', backgroundColor: '#FFFBF0' }}>
 
-<div className="flex flex-col items-center gap-2 mb-8">
-        <h1 className="text-5xl font-bold text-stone-700" style={{ fontFamily: 'Fredoka, sans-serif' }}>
-          Math Club
-        </h1>
-        <p className="text-lg text-stone-400" style={{ fontFamily: 'Nunito, sans-serif' }}>
-          Choose a game to play
-        </p>
-      </div>
+      <div className="min-h-full flex flex-col items-center justify-center px-6 py-8">
 
-      <div className="flex flex-col md:flex-row gap-6 w-full max-w-2xl">
+        <div className="flex flex-col items-center gap-2 mb-8">
+          <h1 className="text-5xl font-bold text-stone-700" style={{ fontFamily: 'Fredoka, sans-serif' }}>
+            Math Club
+          </h1>
+          <p className="text-lg text-stone-400" style={{ fontFamily: 'Nunito, sans-serif' }}>
+            Choose a game to play
+          </p>
+        </div>
+
+      <div className="flex flex-col sm:flex-row gap-6 w-full max-w-2xl">
         {games.map(game => {
           const isHovered = hoveredKey === game.key
           return (
@@ -136,6 +138,8 @@ export default function GameSelectScreen({ onSelectSymbols, onSelectSumStrings, 
             </button>
           )
         })}
+      </div>
+
       </div>
     </div>
   )

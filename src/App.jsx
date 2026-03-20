@@ -35,7 +35,7 @@ export default function App() {
   const [levelUpMsg, setLevelUpMsg]     = useState(false)
   const [negativeWarning, setNegativeWarning] = useState(false)
   const [showResetConfirm, setShowResetConfirm] = useState(false)
-  const [screen, setScreen]             = useState('title')
+  const [screen, setScreen]             = useState(saved.started ? 'game' : 'title')
 
   // When template changes, reset state
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('mathclub_progress', JSON.stringify({ level, correctCount, streak }))
+      localStorage.setItem('mathclub_progress', JSON.stringify({ level, correctCount, streak, started: screen === 'game' }))
     } catch { /* ignore */ }
   }, [level, correctCount, streak])
 
@@ -154,7 +154,7 @@ export default function App() {
 
   function handleReset() {
     playClick()
-    try { localStorage.removeItem('mathclub_progress') } catch { /* ignore */ }
+    try { localStorage.setItem('mathclub_progress', '{}') } catch { /* ignore */ }
     setShowResetConfirm(false)
     setLevel(1)
     setCorrectCount(0)
@@ -165,7 +165,12 @@ export default function App() {
 
   // ── SCREENS ───────────────────────────────────────────────────────────────
 
-  if (screen === 'title') return <TitleScreen onPlay={() => setScreen('game')} />
+  if (screen === 'title') return (
+    <TitleScreen onPlay={() => {
+      try { localStorage.setItem('mathclub_progress', JSON.stringify({ level, correctCount, streak, started: true })) } catch { /* ignore */ }
+      setScreen('game')
+    }} />
+  )
   if (screen === 'win')   return <WinScreen   onPlayAgain={handleReset} />
 
   // ── GAME ──────────────────────────────────────────────────────────────────

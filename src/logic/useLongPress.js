@@ -13,18 +13,25 @@ export function useLongPress(callback, { delay = 380, interval = 80, onStart } =
   const callbackRef = useRef(callback)
   useEffect(() => { callbackRef.current = callback })
 
+  const stop = useCallback(() => {
+    clearTimeout(timeoutRef.current)
+    clearInterval(intervalRef.current)
+    timeoutRef.current = null
+    intervalRef.current = null
+  }, [])
+
+  // Clear timers on unmount
+  useEffect(() => () => stop(), [stop])
+
   const start = useCallback(() => {
+    // Always clear any previous timers so double-fires can't stack intervals
+    stop()
     if (onStart) onStart()
     callbackRef.current()
     timeoutRef.current = setTimeout(() => {
       intervalRef.current = setInterval(() => callbackRef.current(), interval)
     }, delay)
-  }, [delay, interval, onStart])
-
-  const stop = useCallback(() => {
-    clearTimeout(timeoutRef.current)
-    clearInterval(intervalRef.current)
-  }, [])
+  }, [delay, interval, onStart, stop])
 
   return {
     onPointerDown:  start,

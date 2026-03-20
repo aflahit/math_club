@@ -14,17 +14,22 @@ const EVAL_LEVEL_CONFIG = {
   10: { symbolCount: 6, constRange: [2, 6], allowMinus: true,  allowParens: true  },
 }
 
-// ── TARGET MODE (levels 11–15) — backward thinking ─────────────────────────
+// ── TARGET MODE (levels 11–20) — backward thinking ─────────────────────────
 // Mystery symbol always has sign +1; kid figures out its value.
 const TARGET_LEVEL_CONFIG = {
-  11: { symbolCount: 1, constRange: [2, 6], allowMinus: false, solRange: [2, 7],  targetRange: [5,  12] },
-  12: { symbolCount: 2, constRange: [2, 5], allowMinus: false, solRange: [2, 6],  targetRange: [8,  16] },
-  13: { symbolCount: 2, constRange: [2, 6], allowMinus: true,  solRange: [2, 7],  targetRange: [6,  14] },
-  14: { symbolCount: 3, constRange: [2, 5], allowMinus: false, solRange: [2, 6],  targetRange: [10, 20] },
-  15: { symbolCount: 3, constRange: [2, 6], allowMinus: true,  solRange: [2, 8],  targetRange: [8,  18] },
+  11: { symbolCount: 1, constRange: [2, 6],  allowMinus: false, allowParens: false, solRange: [2, 7],  targetRange: [5,  12] },
+  12: { symbolCount: 2, constRange: [2, 5],  allowMinus: false, allowParens: false, solRange: [2, 6],  targetRange: [8,  16] },
+  13: { symbolCount: 2, constRange: [2, 6],  allowMinus: true,  allowParens: false, solRange: [2, 7],  targetRange: [6,  14] },
+  14: { symbolCount: 3, constRange: [2, 5],  allowMinus: false, allowParens: false, solRange: [2, 6],  targetRange: [10, 20] },
+  15: { symbolCount: 3, constRange: [2, 6],  allowMinus: true,  allowParens: false, solRange: [2, 8],  targetRange: [8,  18] },
+  16: { symbolCount: 4, constRange: [3, 8],  allowMinus: true,  allowParens: false, solRange: [3, 9],  targetRange: [10, 25] },
+  17: { symbolCount: 4, constRange: [3, 8],  allowMinus: true,  allowParens: false, solRange: [4, 10], targetRange: [15, 30] },
+  18: { symbolCount: 5, constRange: [3, 8],  allowMinus: true,  allowParens: true,  solRange: [3, 9],  targetRange: [12, 28] },
+  19: { symbolCount: 5, constRange: [3, 9],  allowMinus: true,  allowParens: true,  solRange: [4, 10], targetRange: [15, 35] },
+  20: { symbolCount: 6, constRange: [2, 8],  allowMinus: true,  allowParens: true,  solRange: [3, 10], targetRange: [10, 40] },
 }
 
-export const MAX_LEVEL = 15
+export const MAX_LEVEL = 20
 export const CORRECT_TO_ADVANCE = 3
 
 function randInt(min, max) {
@@ -38,6 +43,18 @@ function shuffle(arr) {
     ;[a[i], a[j]] = [a[j], a[i]]
   }
   return a
+}
+
+// ── Shared expression evaluator (used by both generator and game) ───────────
+
+export function evaluateExpression(terms, userValues) {
+  return terms.reduce((acc, term) => {
+    if (term.type === 'group') {
+      return acc + term.sign * evaluateExpression(term.terms, userValues)
+    }
+    const val = term.type === 'symbol' ? (userValues[term.id] ?? 1) : term.value
+    return acc + term.sign * val
+  }, 0)
 }
 
 // ── Shared flat-term builder ────────────────────────────────────────────────
@@ -117,8 +134,8 @@ function generateEvaluatePuzzle(level) {
 // subtracting an unknown.
 
 function generateTargetPuzzle(level) {
-  const config = TARGET_LEVEL_CONFIG[level] || TARGET_LEVEL_CONFIG[11]
-  const { symbolCount, constRange, allowMinus, solRange, targetRange } = config
+  const config = TARGET_LEVEL_CONFIG[level] || TARGET_LEVEL_CONFIG[15]
+  const { symbolCount, constRange, allowMinus, allowParens, solRange, targetRange } = config
 
   const symbols = shuffle(SYMBOL_IDS).slice(0, symbolCount)
 
@@ -133,29 +150,26 @@ function generateTargetPuzzle(level) {
 
   // Build expression — mystery symbol is pinned to sign +1
   for (let attempt = 0; attempt < 80; attempt++) {
-    const terms = buildFlatTerms(symbols, constRange, allowMinus, [mysteryId])
+    let terms = buildFlatTerms(symbols, constRange, allowMinus, [mysteryId])
 
-    const target = terms.reduce((acc, term) => {
-      if (term.type === 'group') return acc  // no parens in target mode
-      const v = term.type === 'symbol' ? solution[term.id] : term.value
-      return acc + term.sign * v
-    }, 0)
+    if (allowParens && terms.length >= 4 && Math.random() > 0.4) {
+      terms = addParentheses(terms)
+    }
+
+    const target = evaluateExpression(terms, solution)
 
     if (target >= targetRange[0] && target <= targetRange[1]) {
       return { type: 'target', symbols, terms, target, mysteryId, solution }
     }
   }
 
-  // Fallback: all positive
+  // Fallback: all positive, no parens
   const [cMin, cMax] = constRange
   const constValue = randInt(cMin, cMax)
   const items = [...symbols.map(id => ({ type: 'symbol', id }))]
   items.splice(randInt(0, symbols.length), 0, { type: 'number', value: constValue })
   const terms = items.map((item, i) => ({ ...item, sign: 1 }))
-  const target = terms.reduce((acc, t) => {
-    const v = t.type === 'symbol' ? solution[t.id] : t.value
-    return acc + v
-  }, 0)
+  const target = evaluateExpression(terms, solution)
   return { type: 'target', symbols, terms, target, mysteryId, solution }
 }
 
@@ -164,14 +178,4 @@ function generateTargetPuzzle(level) {
 export function generateTemplate(level = 1) {
   if (level >= 11) return generateTargetPuzzle(level)
   return generateEvaluatePuzzle(level)
-}
-
-export function evaluateExpression(terms, userValues) {
-  return terms.reduce((acc, term) => {
-    if (term.type === 'group') {
-      return acc + term.sign * evaluateExpression(term.terms, userValues)
-    }
-    const val = term.type === 'symbol' ? (userValues[term.id] ?? 1) : term.value
-    return acc + term.sign * val
-  }, 0)
 }

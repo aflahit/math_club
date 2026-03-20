@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Flame, MoonStar, PartyPopper, RotateCcw } from 'lucide-react'
+import { Flame, MoonStar, PartyPopper, RotateCcw, Home } from 'lucide-react'
 import { generateTemplate, evaluateExpression, MAX_LEVEL, CORRECT_TO_ADVANCE } from './logic/generator'
 import { playCorrect, playWrong, playLevelUp, playClick } from './logic/sound'
 import SymbolCard from './components/SymbolCard'
@@ -11,6 +11,8 @@ import Feedback from './components/Feedback'
 import Confetti from './components/Confetti'
 import TitleScreen from './components/TitleScreen'
 import WinScreen from './components/WinScreen'
+import GameSelectScreen from './components/GameSelectScreen'
+import SumStringsGame from './SumStrings/SumStringsGame'
 
 function initValues(symbols) {
   return Object.fromEntries(symbols.map(s => [s, 1]))
@@ -36,7 +38,11 @@ export default function App() {
   const [levelUpMsg, setLevelUpMsg]     = useState(false)
   const [negativeWarning, setNegativeWarning] = useState(false)
   const [showResetConfirm, setShowResetConfirm] = useState(false)
-  const [screen, setScreen]             = useState(saved.started ? 'game' : 'title')
+  const [showHomeConfirm, setShowHomeConfirm]   = useState(false)
+  const [screen, setScreen]             = useState(() => {
+    if (!saved.started) return 'title'
+    return saved.started === 'sumstrings' ? 'sumstrings' : 'game'
+  })
 
   // When template changes, reset state
   useEffect(() => {
@@ -57,9 +63,10 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('mathclub_progress', JSON.stringify({ level, correctCount, streak, started: screen === 'game' }))
+      const started = screen === 'game' ? 'game' : screen === 'sumstrings' ? 'sumstrings' : false
+      localStorage.setItem('mathclub_progress', JSON.stringify({ level, correctCount, streak, started }))
     } catch { /* ignore */ }
-  }, [level, correctCount, streak])
+  }, [level, correctCount, streak, screen])
 
   function loadNewPuzzle(lvl) {
     setTemplate(generateTemplate(lvl))
@@ -163,17 +170,42 @@ export default function App() {
     setCorrectCount(0)
     setStreak(0)
     setTemplate(generateTemplate(1))
-    setScreen('title')
+    setScreen('gameSelect')
   }
 
   // ── SCREENS ───────────────────────────────────────────────────────────────
 
   if (screen === 'title') return (
     <TitleScreen onPlay={() => {
-      try { localStorage.setItem('mathclub_progress', JSON.stringify({ level, correctCount, streak, started: true })) } catch { /* ignore */ }
-      setScreen('game')
+      setScreen('gameSelect')
     }} />
   )
+
+  if (screen === 'gameSelect') {
+    const ssSaved = (() => { try { return JSON.parse(localStorage.getItem('mathclub_ss_progress')) || {} } catch { return {} } })()
+    return (
+      <GameSelectScreen
+        symbolsLevel={level}
+        ssLevel={ssSaved.level || 1}
+        onSelectSymbols={() => {
+          try { localStorage.setItem('mathclub_progress', JSON.stringify({ level, correctCount, streak, started: 'game' })) } catch {}
+          setScreen('game')
+        }}
+        onSelectSumStrings={() => {
+          try { localStorage.setItem('mathclub_progress', JSON.stringify({ level, correctCount, streak, started: 'sumstrings' })) } catch {}
+          setScreen('sumstrings')
+        }}
+      />
+    )
+  }
+
+  if (screen === 'sumstrings') return (
+    <SumStringsGame
+      onExit={() => { setScreen('gameSelect') }}
+      onWin={() => setScreen('win')}
+    />
+  )
+
   if (screen === 'win')   return <WinScreen   onPlayAgain={handleReset} />
 
   // ── GAME ──────────────────────────────────────────────────────────────────
@@ -233,6 +265,13 @@ export default function App() {
 
         <div className="flex items-center gap-3">
           <button
+            onPointerDown={() => { playClick(); setShowHomeConfirm(true) }}
+            className="flex items-center gap-1 px-3 py-2 rounded-2xl transition-all active:scale-95"
+            style={{ background: '#F5F0FF', border: '2.5px solid #C49BFF', boxShadow: '0 3px 0 #7A4BCF', filter: 'url(#crayon)' }}>
+            <Home size={18} color="#7A4BCF" strokeWidth={2.2} />
+          </button>
+
+          <button
             onPointerDown={() => { playClick(); setShowResetConfirm(true) }}
             className="flex items-center gap-1 px-3 py-2 rounded-2xl transition-all active:scale-95"
             style={{ background: '#F5F0FF', border: '2.5px solid #C49BFF', boxShadow: '0 3px 0 #7A4BCF', filter: 'url(#crayon)' }}>
@@ -256,6 +295,39 @@ export default function App() {
           </div>
         </div>
       </header>
+
+      {/* ── HOME MODAL ── */}
+      {showHomeConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ backgroundColor: 'rgba(0,0,0,0.25)', backdropFilter: 'blur(4px)' }}>
+          <div className="animate-bounce-in flex flex-col items-center gap-5 px-10 py-8 rounded-3xl mx-6"
+            style={{
+              backgroundColor: '#FFFBF0', border: '3px solid #C49BFF',
+              boxShadow: '0 8px 0 #7A4BCF, 0 12px 40px rgba(0,0,0,0.2)',
+              filter: 'url(#crayon)', maxWidth: 360,
+            }}>
+            <Home size={40} color="#7A4BCF" strokeWidth={2} />
+            <p className="text-3xl font-bold text-center text-stone-700" style={{ fontFamily: 'Fredoka, sans-serif' }}>
+              Go back to game select?
+            </p>
+            <p className="text-lg text-stone-400 text-center">Your level progress is saved.</p>
+            <div className="flex gap-4 w-full">
+              <button
+                onPointerDown={() => { playClick(); setShowHomeConfirm(false) }}
+                className="flex-1 py-4 rounded-2xl text-2xl font-bold text-stone-600 active:scale-95"
+                style={{ fontFamily: 'Fredoka, sans-serif', background: '#F0EDE8', boxShadow: '0 4px 0 #C0BCB8' }}>
+                No
+              </button>
+              <button
+                onPointerDown={() => { playClick(); setShowHomeConfirm(false); setScreen('gameSelect') }}
+                className="flex-1 py-4 rounded-2xl text-2xl font-bold text-white active:scale-95"
+                style={{ fontFamily: 'Fredoka, sans-serif', background: 'linear-gradient(135deg, #B27BFF, #7A4BCF)', boxShadow: '0 4px 0 #5A2BAF' }}>
+                Yes!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── RESET MODAL ── */}
       {showResetConfirm && (

@@ -1,8 +1,9 @@
 import { PartyPopper } from 'lucide-react'
 
-export default function Feedback({ phase, got, expected }) {
+export default function Feedback({ phase, got, expected, wrongCount = 0 }) {
   if (phase !== 'correct' && phase !== 'wrong') return null
-  const isCorrect = phase === 'correct'
+  const isCorrect  = phase === 'correct'
+  const showHint   = wrongCount >= 3
 
   return (
     <div
@@ -27,9 +28,15 @@ export default function Feedback({ phase, got, expected }) {
           <p className="text-2xl font-bold text-orange-500" style={{ fontFamily: 'Fredoka, sans-serif' }}>
             Not quite!
           </p>
-          <p className="text-lg text-stone-500" style={{ fontFamily: 'Nunito, sans-serif' }}>
-            You got <strong>{got}</strong> — looking for <strong>{expected}</strong>
-          </p>
+          {showHint ? (
+            <p className="text-lg text-stone-500" style={{ fontFamily: 'Nunito, sans-serif' }}>
+              You got <strong>{got}</strong> — looking for <strong>{expected}</strong>
+            </p>
+          ) : (
+            <p className="text-base text-stone-400" style={{ fontFamily: 'Nunito, sans-serif' }}>
+              Try again!
+            </p>
+          )}
         </>
       )}
     </div>

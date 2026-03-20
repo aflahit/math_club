@@ -30,6 +30,7 @@ export default function App() {
   const [userAnswer, setUserAnswer]     = useState(0)   // evaluate mode only
   const [gotResult, setGotResult]       = useState(null) // what user got
   const [expectedResult, setExpected]   = useState(null) // what was needed
+  const [wrongCount, setWrongCount]     = useState(0)
   const [confetti, setConfetti]         = useState(false)
   const [shakeBtn, setShakeBtn]         = useState(false)
   const [levelUpMsg, setLevelUpMsg]     = useState(false)
@@ -45,6 +46,7 @@ export default function App() {
     setGotResult(null)
     setExpected(null)
     setNegativeWarning(false)
+    setWrongCount(0)
     // Target mode with 1 symbol: skip setting phase
     if (template.type === 'target' && template.symbols.length === 1) {
       setPhase('guessing')
@@ -121,6 +123,7 @@ export default function App() {
     } else {
       setPhase('wrong')
       setStreak(0)
+      setWrongCount(c => c + 1)
       setShakeBtn(true)
       playWrong()
       setTimeout(() => setShakeBtn(false), 500)
@@ -361,7 +364,7 @@ export default function App() {
 
           {/* RESULT feedback */}
           {(phase === 'correct' || phase === 'wrong') && (
-            <Feedback phase={phase} got={gotResult} expected={expectedResult} />
+            <Feedback phase={phase} got={gotResult} expected={expectedResult} wrongCount={wrongCount} />
           )}
 
           {/* Negative warning */}

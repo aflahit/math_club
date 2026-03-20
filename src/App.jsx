@@ -13,6 +13,7 @@ import TitleScreen from './components/TitleScreen'
 import WinScreen from './components/WinScreen'
 import GameSelectScreen from './components/GameSelectScreen'
 import SumStringsGame from './SumStrings/SumStringsGame'
+import DirectionGame from './Direction/DirectionGame'
 
 function initValues(symbols) {
   return Object.fromEntries(symbols.map(s => [s, 1]))
@@ -41,7 +42,9 @@ export default function App() {
   const [showHomeConfirm, setShowHomeConfirm]   = useState(false)
   const [screen, setScreen]             = useState(() => {
     if (!saved.started) return 'title'
-    return saved.started === 'sumstrings' ? 'sumstrings' : 'game'
+    if (saved.started === 'sumstrings') return 'sumstrings'
+    if (saved.started === 'direction')  return 'direction'
+    return 'game'
   })
 
   // When template changes, reset state
@@ -63,7 +66,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      const started = screen === 'game' ? 'game' : screen === 'sumstrings' ? 'sumstrings' : false
+      const started = screen === 'game' ? 'game' : screen === 'sumstrings' ? 'sumstrings' : screen === 'direction' ? 'direction' : false
       localStorage.setItem('mathclub_progress', JSON.stringify({ level, correctCount, streak, started }))
     } catch { /* ignore */ }
   }, [level, correctCount, streak, screen])
@@ -182,11 +185,13 @@ export default function App() {
   )
 
   if (screen === 'gameSelect') {
-    const ssSaved = (() => { try { return JSON.parse(localStorage.getItem('mathclub_ss_progress')) || {} } catch { return {} } })()
+    const ssSaved  = (() => { try { return JSON.parse(localStorage.getItem('mathclub_ss_progress'))  || {} } catch { return {} } })()
+    const dirSaved = (() => { try { return JSON.parse(localStorage.getItem('mathclub_dir_progress')) || {} } catch { return {} } })()
     return (
       <GameSelectScreen
         symbolsLevel={level}
         ssLevel={ssSaved.level || 1}
+        dirLevel={dirSaved.level || 1}
         onSelectSymbols={() => {
           try { localStorage.setItem('mathclub_progress', JSON.stringify({ level, correctCount, streak, started: 'game' })) } catch {}
           setScreen('game')
@@ -195,6 +200,10 @@ export default function App() {
           try { localStorage.setItem('mathclub_progress', JSON.stringify({ level, correctCount, streak, started: 'sumstrings' })) } catch {}
           setScreen('sumstrings')
         }}
+        onSelectDirection={() => {
+          try { localStorage.setItem('mathclub_progress', JSON.stringify({ level, correctCount, streak, started: 'direction' })) } catch {}
+          setScreen('direction')
+        }}
       />
     )
   }
@@ -202,6 +211,13 @@ export default function App() {
   if (screen === 'sumstrings') return (
     <SumStringsGame
       onExit={() => { setScreen('gameSelect') }}
+      onWin={() => setScreen('win')}
+    />
+  )
+
+  if (screen === 'direction') return (
+    <DirectionGame
+      onExit={() => setScreen('gameSelect')}
       onWin={() => setScreen('win')}
     />
   )

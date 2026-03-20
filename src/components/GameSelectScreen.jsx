@@ -34,7 +34,7 @@ function MiniRope() {
   )
 }
 
-export default function GameSelectScreen({ onSelectSymbols, onSelectSumStrings, symbolsLevel, ssLevel }) {
+export default function GameSelectScreen({ onSelectSymbols, onSelectSumStrings, onSelectDirection, symbolsLevel, ssLevel, dirLevel }) {
   const [hoveredKey, setHoveredKey] = useState(null)
 
   const games = [
@@ -71,6 +71,34 @@ export default function GameSelectScreen({ onSelectSymbols, onSelectSumStrings, 
       onPlay: onSelectSumStrings,
       preview: <MiniRope />,
     },
+    {
+      key: 'direction',
+      title: 'Direction!',
+      desc: 'Guide the drone across the grid step by step',
+      level: dirLevel || 1,
+      color: '#3ECFCF',
+      shadow: '#157A7A',
+      bg: '#DCF8F8',
+      border: '#3ECFCF',
+      onPlay: onSelectDirection,
+      preview: (
+        <div className="flex items-center justify-center gap-3 py-2">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 26px)', gap: 3 }}>
+            {[...Array(9)].map((_, i) => (
+              <div key={i} style={{
+                width: 26, height: 26, borderRadius: 5,
+                backgroundColor: i === 4 ? '#DCF8F8' : '#F0EDE8',
+                border: `2px solid ${i === 4 ? '#3ECFCF' : '#DDD5C5'}`,
+              }} />
+            ))}
+          </div>
+          <div style={{ fontFamily: 'Fredoka, sans-serif', fontSize: 20, color: '#157A7A', lineHeight: 1.8 }}>
+            <div>↑ 2</div>
+            <div>→ 1</div>
+          </div>
+        </div>
+      ),
+    },
   ]
 
   return (
@@ -88,7 +116,7 @@ export default function GameSelectScreen({ onSelectSymbols, onSelectSumStrings, 
           </p>
         </div>
 
-      <div className="flex flex-col sm:flex-row gap-6 w-full max-w-2xl">
+      <div className="flex flex-col sm:flex-row flex-wrap gap-6 w-full max-w-4xl">
         {games.map(game => {
           const isHovered = hoveredKey === game.key
           return (

@@ -1,19 +1,18 @@
-import { getSymbol, SymbolIcon } from '../symbols'
+import { getSymbol, SymbolIcon } from '../symbols.jsx'
 import { playClick } from '../logic/sound'
+import { useLongPress } from '../logic/useLongPress'
 
-export default function SymbolCard({ id, index, value, onChange, disabled }) {
+export default function SymbolCard({ id, value, onChange, disabled }) {
   const { bg, border, stroke } = getSymbol(id)
 
-  function inc() {
-    if (disabled || value >= 20) return
-    playClick()
-    onChange(value + 1)
-  }
-  function dec() {
-    if (disabled || value <= 1) return
-    playClick()
-    onChange(value - 1)
-  }
+  const incPress = useLongPress(
+    () => { if (!disabled && value < 20) onChange(value + 1) },
+    { onStart: playClick }
+  )
+  const decPress = useLongPress(
+    () => { if (!disabled && value > 1) onChange(value - 1) },
+    { onStart: playClick }
+  )
 
   return (
     <div className="flex flex-col items-center gap-3 select-none">
@@ -30,7 +29,7 @@ export default function SymbolCard({ id, index, value, onChange, disabled }) {
         }}
       >
         <button
-          onPointerDown={inc}
+          {...incPress}
           disabled={disabled || value >= 20}
           className="w-full py-3 text-3xl leading-none font-bold text-white active:scale-95 transition-all disabled:opacity-30"
           style={{ backgroundColor: border, fontFamily: 'Fredoka, sans-serif' }}
@@ -47,7 +46,7 @@ export default function SymbolCard({ id, index, value, onChange, disabled }) {
         </div>
 
         <button
-          onPointerDown={dec}
+          {...decPress}
           disabled={disabled || value <= 1}
           className="w-full py-3 text-3xl leading-none font-bold text-white active:scale-95 transition-all disabled:opacity-30"
           style={{ backgroundColor: border, fontFamily: 'Fredoka, sans-serif' }}

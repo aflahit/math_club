@@ -1,16 +1,15 @@
 import { playClick } from '../logic/sound'
+import { useLongPress } from '../logic/useLongPress'
 
 export default function AnswerInput({ value, onChange, disabled }) {
-  function inc() {
-    if (disabled || value >= 40) return
-    playClick()
-    onChange(value + 1)
-  }
-  function dec() {
-    if (disabled || value <= 0) return
-    playClick()
-    onChange(value - 1)
-  }
+  const incPress = useLongPress(
+    () => { if (!disabled && value < 40) onChange(value + 1) },
+    { onStart: playClick }
+  )
+  const decPress = useLongPress(
+    () => { if (!disabled && value > 0) onChange(value - 1) },
+    { onStart: playClick }
+  )
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -31,9 +30,8 @@ export default function AnswerInput({ value, onChange, disabled }) {
           filter: 'url(#crayon)',
         }}
       >
-        {/* Up */}
         <button
-          onPointerDown={inc}
+          {...incPress}
           disabled={disabled}
           className="w-full py-3 text-3xl leading-none text-white font-bold active:scale-95 transition-all disabled:opacity-30"
           style={{ backgroundColor: '#B27BFF', fontFamily: 'Fredoka, sans-serif' }}
@@ -42,7 +40,6 @@ export default function AnswerInput({ value, onChange, disabled }) {
           ▲
         </button>
 
-        {/* Value */}
         <div
           className="py-3 px-6 text-5xl font-bold text-center leading-none"
           style={{ fontFamily: 'Fredoka, sans-serif', color: '#824BCF' }}
@@ -50,9 +47,8 @@ export default function AnswerInput({ value, onChange, disabled }) {
           {value}
         </div>
 
-        {/* Down */}
         <button
-          onPointerDown={dec}
+          {...decPress}
           disabled={disabled}
           className="w-full py-3 text-3xl leading-none text-white font-bold active:scale-95 transition-all disabled:opacity-30"
           style={{ backgroundColor: '#B27BFF', fontFamily: 'Fredoka, sans-serif' }}

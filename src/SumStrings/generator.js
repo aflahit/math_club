@@ -22,8 +22,8 @@ const LEVEL_CONFIG = [
   { total: 10, seedRange: [3, 9], knownIndices: [1, 3, 7]       },  // L16: bigger seeds
   { total: 11, seedRange: [2, 7], knownIndices: [1, 4, 7, 9]    },  // L17: longer string
   { total: 11, seedRange: [3, 8], knownIndices: [1, 4, 8]       },  // L18: sparser
-  { total: 12, seedRange: [3, 8], knownIndices: [1, 5, 9]       },  // L19: long + sparse
-  { total: 12, seedRange: [4, 9], knownIndices: [1, 5, 9]       },  // L20: big seeds, sparse
+  { total: 12, seedRange: [3, 7], knownIndices: [1, 4, 7, 10]   },  // L19: long, 4 anchors
+  { total: 12, seedRange: [4, 8], knownIndices: [1, 4, 8, 10]   },  // L20: big seeds, 4 anchors
 ]
 
 export const SS_MAX_LEVEL = 20

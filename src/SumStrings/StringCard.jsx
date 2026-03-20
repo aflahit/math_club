@@ -1,5 +1,6 @@
 import { useLongPress } from '../logic/useLongPress'
 import { playClick } from '../logic/sound'
+import SittingBird from './SittingBird'
 
 const COLORS = [
   { bg: '#FFF0DC', border: '#FF8C42', text: '#CC6010', shadow: '#C05000' },
@@ -13,7 +14,7 @@ const COLORS = [
 const STRING_HEIGHT = 24 // px
 
 /** A card hanging from the rope */
-export default function StringCard({ value, index, isKnown, userValue, onChange, checked, isCorrect, disabled }) {
+export default function StringCard({ value, index, isKnown, userValue, onChange, checked, isCorrect, disabled, showBird, birdDelay, birdFlip }) {
   const colors = COLORS[index % COLORS.length]
 
   const incPress = useLongPress(
@@ -32,7 +33,12 @@ export default function StringCard({ value, index, isKnown, userValue, onChange,
 
   if (isKnown) {
     return (
-      <div className="flex flex-col items-center shrink-0">
+      <div className="flex flex-col items-center shrink-0 relative">
+        {showBird && (
+          <div className="absolute z-30" style={{ top: -40, left: '50%', transform: 'translateX(-50%)' }}>
+            <SittingBird colorIndex={index} delay={birdDelay ?? 0} flip={birdFlip} />
+          </div>
+        )}
         <StringLine />
         <div
           className="flex items-center justify-center rounded-2xl px-4 py-3"
@@ -70,7 +76,12 @@ export default function StringCard({ value, index, isKnown, userValue, onChange,
   }
 
   return (
-    <div className="flex flex-col items-center shrink-0">
+    <div className="flex flex-col items-center shrink-0 relative">
+      {showBird && (
+        <div className="absolute z-30" style={{ top: -40, left: '50%', transform: 'translateX(-50%)' }}>
+          <SittingBird colorIndex={index} delay={birdDelay ?? 0} />
+        </div>
+      )}
       <StringLine />
       <div
         className="flex flex-col items-center rounded-2xl overflow-hidden"

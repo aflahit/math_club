@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Flame, MoonStar, PartyPopper, RotateCcw, Home } from 'lucide-react'
 import { generatePuzzle, SS_MAX_LEVEL, SS_CORRECT_TO_ADVANCE } from './generator'
 import StringCard from './StringCard'
+import RaceCar from './RaceCar'
 import Confetti from '../components/Confetti'
 import { playCorrect, playWrong, playLevelUp, playClick } from '../logic/sound'
 
@@ -20,6 +21,9 @@ export default function SumStringsGame({ onExit, onWin }) {
   const [confetti, setConfetti]         = useState(false)
   const [levelUpMsg, setLevelUpMsg]     = useState(false)
   const [checkedCards, setCheckedCards] = useState(null) // null | bool[]
+  const [birdFlips, setBirdFlips]       = useState([])
+  const [carColorIndex, setCarColorIndex] = useState(0)
+  const [showCar, setShowCar]             = useState(false)
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [showHomeConfirm, setShowHomeConfirm]   = useState(false)
 
@@ -55,6 +59,9 @@ export default function SumStringsGame({ onExit, onWin }) {
       setPhase('correct')
       setStreak(s => s + 1)
       setConfetti(true)
+      setBirdFlips(seq.map(() => Math.random() < 0.5))
+      setCarColorIndex(Math.floor(Math.random() * 6))
+      setShowCar(true)
       playCorrect()
 
       const newCount = correctCount + 1
@@ -272,6 +279,9 @@ export default function SumStringsGame({ onExit, onWin }) {
                 checked={checkedCards !== null && !knownIndices.includes(i)}
                 isCorrect={checkedCards ? checkedCards[i] : false}
                 disabled={phase !== 'playing'}
+                showBird={phase === 'correct'}
+                birdDelay={i * 0.1}
+                birdFlip={birdFlips[i] ?? false}
               />
             ))}
           </div>
@@ -357,6 +367,8 @@ export default function SumStringsGame({ onExit, onWin }) {
           </button>
         )}
       </div>
+
+      {showCar && <RaceCar colorIndex={carColorIndex} onDone={() => setShowCar(false)} />}
     </div>
   )
 }

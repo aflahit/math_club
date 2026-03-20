@@ -71,7 +71,7 @@ export default function DirectionGame({ onExit, onWin }) {
     setTrail([path[0]])
 
     for (let i = 1; i < path.length; i++) {
-      await sleep(280)
+      await sleep(480)
       setDronePos(path[i])
       setTrail(prev => [...prev, path[i]])
     }
@@ -289,115 +289,122 @@ export default function DirectionGame({ onExit, onWin }) {
       )}
 
       {/* ── MAIN CONTENT ── */}
-      <div className="flex-1 flex flex-col items-center justify-center gap-4 px-4 pb-6 overflow-hidden">
+      <div className="flex-1 flex flex-row items-center justify-center gap-8 px-6 py-4 overflow-y-auto">
 
-        {/* Phase label */}
-        <p className="text-base uppercase tracking-widest text-stone-400"
-          style={{ fontFamily: 'Fredoka, sans-serif', letterSpacing: '0.15em' }}>
-          {phaseLabel}
-        </p>
-
-        {/* Steps display */}
-        <div className="flex flex-row items-center justify-center gap-3 flex-wrap">
-          {puzzle.steps.map((step, i) => (
-            <div key={i}
-              className="flex flex-col items-center gap-1 px-4 py-2 rounded-2xl"
-              style={{
-                background: '#DCF0FF',
-                border: '2.5px solid #4B9FFF',
-                boxShadow: '0 3px 0 #1A6FAF',
-                filter: 'url(#crayon)',
-                minWidth: 64,
-              }}>
-              <span className="text-2xl leading-none" style={{ fontFamily: 'Fredoka, sans-serif' }}>{step.arrow}</span>
-              <span className="text-2xl font-bold leading-none" style={{ fontFamily: 'Fredoka, sans-serif', color: '#1A6FAF' }}>{step.count}</span>
-            </div>
-          ))}
+        {/* LEFT: Grid + phase label */}
+        <div className="flex flex-col items-center gap-3 shrink-0">
+          <p className="text-base uppercase tracking-widest text-stone-400"
+            style={{ fontFamily: 'Fredoka, sans-serif', letterSpacing: '0.15em' }}>
+            {phaseLabel}
+          </p>
+          <Grid
+            dronePos={dronePos}
+            trail={trail}
+            startCell={puzzle.start}
+            endCell={puzzle.end}
+            selectedCell={selectedCell}
+            onCellTap={handleCellTap}
+            phase={phase}
+            mode={puzzle.mode}
+            revealAnswer={phase === 'wrong' && showHint}
+            correctCell={correctCell}
+          />
         </div>
 
-        {/* Grid */}
-        <Grid
-          dronePos={dronePos}
-          trail={trail}
-          startCell={puzzle.start}
-          endCell={puzzle.end}
-          selectedCell={selectedCell}
-          onCellTap={handleCellTap}
-          phase={phase}
-          mode={puzzle.mode}
-          revealAnswer={phase === 'wrong' && showHint}
-          correctCell={correctCell}
-        />
+        {/* RIGHT: Steps + feedback + CTA */}
+        <div className="flex flex-col items-center justify-center gap-5" style={{ minWidth: 180 }}>
 
-        {/* Feedback */}
-        {phase === 'correct' && (
-          <div className="animate-pop-up flex flex-col items-center gap-1 py-3 px-8 rounded-3xl bg-emerald-100 border-2 border-emerald-400">
-            <PartyPopper size={40} fill="#FFD166" color="#E08800" strokeWidth={1.6} className="animate-bounce-in" />
-            <p className="text-3xl font-bold text-emerald-600" style={{ fontFamily: 'Fredoka, sans-serif' }}>
-              That's right!
+          {/* Steps display */}
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-sm font-bold text-stone-400 uppercase tracking-wider" style={{ fontFamily: 'Fredoka, sans-serif' }}>
+              Steps
             </p>
+            {puzzle.steps.map((step, i) => (
+              <div key={i}
+                className="flex items-center gap-3 px-5 py-3 rounded-2xl w-full"
+                style={{
+                  background: '#DCF0FF',
+                  border: '2.5px solid #4B9FFF',
+                  boxShadow: '0 3px 0 #1A6FAF',
+                  filter: 'url(#crayon)',
+                  minWidth: 120,
+                }}>
+                <span className="text-3xl leading-none" style={{ fontFamily: 'Fredoka, sans-serif' }}>{step.arrow}</span>
+                <span className="text-3xl font-bold leading-none" style={{ fontFamily: 'Fredoka, sans-serif', color: '#1A6FAF' }}>{step.count}</span>
+              </div>
+            ))}
           </div>
-        )}
 
-        {phase === 'wrong' && (
-          <div className="animate-pop-up flex flex-col items-center gap-1 py-3 px-8 rounded-3xl bg-orange-50 border-2 border-orange-300">
-            <p className="text-2xl font-bold text-orange-500" style={{ fontFamily: 'Fredoka, sans-serif' }}>
-              Not quite!
-            </p>
-            {showHint ? (
-              <p className="text-base text-stone-500 text-center" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                The {isBackward ? 'start' : 'landing spot'} is highlighted in green!
+          {/* Feedback */}
+          {phase === 'correct' && (
+            <div className="animate-pop-up flex flex-col items-center gap-1 py-3 px-6 rounded-3xl bg-emerald-100 border-2 border-emerald-400 w-full">
+              <PartyPopper size={36} fill="#FFD166" color="#E08800" strokeWidth={1.6} className="animate-bounce-in" />
+              <p className="text-2xl font-bold text-emerald-600 text-center" style={{ fontFamily: 'Fredoka, sans-serif' }}>
+                That's right!
               </p>
-            ) : (
-              <p className="text-base text-stone-400" style={{ fontFamily: 'Nunito, sans-serif' }}>
-                Try again!
+            </div>
+          )}
+
+          {phase === 'wrong' && (
+            <div className="animate-pop-up flex flex-col items-center gap-1 py-3 px-6 rounded-3xl bg-orange-50 border-2 border-orange-300 w-full">
+              <p className="text-2xl font-bold text-orange-500 text-center" style={{ fontFamily: 'Fredoka, sans-serif' }}>
+                Not quite!
               </p>
-            )}
-          </div>
-        )}
+              {showHint ? (
+                <p className="text-sm text-stone-500 text-center" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                  The {isBackward ? 'start' : 'landing spot'} is highlighted in green!
+                </p>
+              ) : (
+                <p className="text-sm text-stone-400 text-center" style={{ fontFamily: 'Nunito, sans-serif' }}>
+                  Try again!
+                </p>
+              )}
+            </div>
+          )}
 
-        {/* CTA Buttons */}
-        {phase === 'predict' && selectedCell && (
-          <button
-            onPointerDown={handleRun}
-            className="px-16 py-5 rounded-3xl text-4xl text-white font-bold tracking-wide active:scale-95 transition-all"
-            style={{
-              fontFamily: 'Fredoka, sans-serif',
-              background: 'linear-gradient(135deg, #4B9FFF, #1A6FAF)',
-              boxShadow: '0 6px 0 #1A6FAF, 0 8px 24px #4B9FFF55',
-              filter: 'url(#crayon)',
-            }}>
-            Run! →
-          </button>
-        )}
+          {/* CTA Buttons */}
+          {phase === 'predict' && selectedCell && (
+            <button
+              onPointerDown={handleRun}
+              className="w-full py-5 rounded-3xl text-3xl text-white font-bold active:scale-95 transition-all"
+              style={{
+                fontFamily: 'Fredoka, sans-serif',
+                background: 'linear-gradient(135deg, #4B9FFF, #1A6FAF)',
+                boxShadow: '0 6px 0 #1A6FAF, 0 8px 24px #4B9FFF55',
+                filter: 'url(#crayon)',
+              }}>
+              Run! →
+            </button>
+          )}
 
-        {phase === 'correct' && (
-          <button
-            onPointerDown={handleNext}
-            className="px-16 py-5 rounded-3xl text-4xl text-white font-bold tracking-wide active:scale-95 transition-all animate-wiggle"
-            style={{
-              fontFamily: 'Fredoka, sans-serif',
-              background: 'linear-gradient(135deg, #56C596, #268C56)',
-              boxShadow: '0 6px 0 #268C56, 0 8px 24px #56C59655',
-              filter: 'url(#crayon)',
-            }}>
-            Next  →
-          </button>
-        )}
+          {phase === 'correct' && (
+            <button
+              onPointerDown={handleNext}
+              className="w-full py-5 rounded-3xl text-3xl text-white font-bold active:scale-95 transition-all animate-wiggle"
+              style={{
+                fontFamily: 'Fredoka, sans-serif',
+                background: 'linear-gradient(135deg, #56C596, #268C56)',
+                boxShadow: '0 6px 0 #268C56, 0 8px 24px #56C59655',
+                filter: 'url(#crayon)',
+              }}>
+              Next →
+            </button>
+          )}
 
-        {phase === 'wrong' && (
-          <button
-            onPointerDown={handleTryAgain}
-            className="px-16 py-5 rounded-3xl text-4xl text-white font-bold tracking-wide active:scale-95 transition-all"
-            style={{
-              fontFamily: 'Fredoka, sans-serif',
-              background: 'linear-gradient(135deg, #FF8C42, #C05000)',
-              boxShadow: '0 6px 0 #C05000, 0 8px 24px #FF8C4255',
-              filter: 'url(#crayon)',
-            }}>
-            Try Again
-          </button>
-        )}
+          {phase === 'wrong' && (
+            <button
+              onPointerDown={handleTryAgain}
+              className="w-full py-5 rounded-3xl text-3xl text-white font-bold active:scale-95 transition-all"
+              style={{
+                fontFamily: 'Fredoka, sans-serif',
+                background: 'linear-gradient(135deg, #FF8C42, #C05000)',
+                boxShadow: '0 6px 0 #C05000, 0 8px 24px #FF8C4255',
+                filter: 'url(#crayon)',
+              }}>
+              Try Again
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

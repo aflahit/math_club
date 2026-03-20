@@ -101,14 +101,14 @@ export default function Grid({
       <div style={{
         position: 'absolute',
         left: dronePos[0] * CELL_SIZE + CELL_SIZE / 2,
-        top:  dronePos[1] * CELL_SIZE + CELL_SIZE / 2,
+        top:  dronePos[1] * CELL_SIZE + CELL_SIZE / 2 + 6,
         transform: 'translate(-50%, -50%)',
-        transition: 'left 0.25s ease-in-out, top 0.25s ease-in-out',
+        transition: 'left 0.4s ease-in-out, top 0.4s ease-in-out',
         zIndex: 10,
         pointerEvents: 'none',
         opacity: hideDrone ? 0 : 1,
       }}>
-        <Drone size={48} />
+        <Drone size={40} />
       </div>
     </div>
   )

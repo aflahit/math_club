@@ -25,8 +25,7 @@ function Paren({ children }) {
   )
 }
 
-/** Render a flat list of terms (no groups inside) */
-function FlatTerms({ terms, symbols }) {
+function FlatTerms({ terms, mysteryId }) {
   return terms.map((term, i) => (
     <div key={i} className="flex items-center gap-x-2">
       <Op sign={term.sign} isFirst={i === 0} />
@@ -38,21 +37,17 @@ function FlatTerms({ terms, symbols }) {
   ))
 }
 
-/** Render any term — handles flat terms and group nodes */
-function Term({ term, isFirst, symbols }) {
+function Term({ term, isFirst, mysteryId }) {
   if (term.type === 'group') {
     return (
       <div className="flex items-center gap-x-2">
         <Op sign={term.sign} isFirst={isFirst} />
         <Paren>(</Paren>
-        <div className="flex items-center gap-x-2">
-          <FlatTerms terms={term.terms} symbols={symbols} />
-        </div>
+        <FlatTerms terms={term.terms} mysteryId={mysteryId} />
         <Paren>)</Paren>
       </div>
     )
   }
-
   return (
     <div className="flex items-center gap-x-2">
       <Op sign={term.sign} isFirst={isFirst} />
@@ -64,17 +59,30 @@ function Term({ term, isFirst, symbols }) {
   )
 }
 
-export default function ExpressionDisplay({ terms, symbols }) {
+export default function ExpressionDisplay({ terms, symbols, target }) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-2 px-4">
       {terms.map((term, i) => (
         <Term key={i} term={term} isFirst={i === 0} symbols={symbols} />
       ))}
 
-      {/* = ? */}
       <div className="flex items-center gap-x-2">
         <span className="text-4xl font-bold text-stone-400 leading-none" style={{ fontFamily: 'Fredoka, sans-serif' }}>=</span>
-        <span className="text-5xl font-bold leading-none" style={{ fontFamily: 'Fredoka, sans-serif', color: '#C8C0B8' }}>?</span>
+        {target !== undefined ? (
+          <span
+            className="text-5xl font-bold leading-none px-4 py-1 rounded-2xl"
+            style={{
+              fontFamily: 'Fredoka, sans-serif',
+              color: '#7A3FBF',
+              background: '#F0DCFF',
+              border: '2.5px solid #B27BFF',
+            }}
+          >
+            {target}
+          </span>
+        ) : (
+          <span className="text-5xl font-bold leading-none" style={{ fontFamily: 'Fredoka, sans-serif', color: '#C8C0B8' }}>?</span>
+        )}
       </div>
     </div>
   )

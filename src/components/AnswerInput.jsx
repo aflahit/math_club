@@ -3,7 +3,7 @@ import { useLongPress } from '../logic/useLongPress'
 
 export default function AnswerInput({ value, onChange, disabled }) {
   const incPress = useLongPress(
-    () => { if (!disabled && value < 40) onChange(value + 1) },
+    () => { if (!disabled && value < 99) onChange(value + 1) },
     { onStart: playClick }
   )
   const decPress = useLongPress(

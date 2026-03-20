@@ -1,8 +1,7 @@
 import { PartyPopper } from 'lucide-react'
 
-export default function Feedback({ phase, userAnswer, correctAnswer }) {
+export default function Feedback({ phase, got, expected }) {
   if (phase !== 'correct' && phase !== 'wrong') return null
-
   const isCorrect = phase === 'correct'
 
   return (
@@ -20,7 +19,7 @@ export default function Feedback({ phase, userAnswer, correctAnswer }) {
             That's right!
           </p>
           <p className="text-xl text-emerald-500" style={{ fontFamily: 'Nunito, sans-serif' }}>
-            = {correctAnswer} ✓
+            = {expected} ✓
           </p>
         </>
       ) : (
@@ -29,7 +28,7 @@ export default function Feedback({ phase, userAnswer, correctAnswer }) {
             Not quite!
           </p>
           <p className="text-lg text-stone-500" style={{ fontFamily: 'Nunito, sans-serif' }}>
-            You said <strong>{userAnswer}</strong>, but the answer is <strong>{correctAnswer}</strong>
+            You got <strong>{got}</strong> — looking for <strong>{expected}</strong>
           </p>
         </>
       )}
